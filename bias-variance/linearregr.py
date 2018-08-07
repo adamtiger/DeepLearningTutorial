@@ -16,6 +16,33 @@ def data_generator(n, a, b, x_min, x_max, sigma=0.01):
     return x + x_noise, y + y_noise
 
 
+# Initialize the weights
+def init():
+    return np.random.uniform(size=2)
+
+
+# Calculate loss
+def loss(theta, train_x, train_y):
+    X = np.dot(train_x, theta)
+    X = X - train_y
+    X = np.square(X)
+    return np.sum(X)
+
+
+# Calculate gradient
+def gradient(theta, train_x, train_y):
+    grad = np.dot(train_x, theta)
+    grad = grad - train_y
+    grad = np.dot(grad, train_x)
+    return grad
+
+
+# Update the weights
+def update(theta, grad, lr=0.01):
+    theta = theta - lr * grad
+    return np.copy(theta)
+
+
 def linear_regressor(data, lr=0.1, max_iter=100, split_ratio=0.8, verbose=False):
     
     '''
@@ -46,26 +73,6 @@ def linear_regressor(data, lr=0.1, max_iter=100, split_ratio=0.8, verbose=False)
     temp_x[:, 0] = test_x
     test_x = temp_x
 
-    # Initialize the weights
-    def init():
-        return np.random.uniform(size=2)
-
-    # Calculate loss
-    def loss(theta, train_x, train_y):
-        return np.sum(np.square(np.dot(train_x, theta) - train_y))
-
-    # Calculate gradient
-    def gradient(theta, train_x, train_y):
-        grad = np.dot(train_x, theta)
-        grad = grad - train_y
-        grad = np.multiply(grad, train_x)
-        return np.sum(grad)
-
-    # Update the weights
-    def update(theta, grad, lr=0.01):
-        theta = theta - lr * grad
-        return np.copy(theta)
-
     # Train
     theta = init()
     train_losses = []
@@ -81,8 +88,3 @@ def linear_regressor(data, lr=0.1, max_iter=100, split_ratio=0.8, verbose=False)
     
     # Return: a, b, train_loss list(iter, loss), test_loss (iter, loss)
     return theta[0], theta[1], train_losses, test_losses
-
-    
-
-
-
