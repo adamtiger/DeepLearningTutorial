@@ -1,5 +1,4 @@
 import numpy as np
-from matplotlib.pyplot import plot, show
 
 # An implementation for the linear regression with gradient descent.
 
