@@ -1,6 +1,9 @@
 .vscode/
 
 
+data/
 bias-variance/__pycache__/
 bias-variance/.ipynb_checkpoints/
+logistic-regression/__pycache__/
+logistic-regression/.ipynb_checkpoints/
 .ipynb_checkpoints/
