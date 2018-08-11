@@ -107,7 +107,17 @@ def logistic_regression(data, lr, max_iter, batch_size, epoch=5, split_ratio=0.8
         training_losses.append(train_loss)
 
         nabla_J = grad(theta, batch_x, batch_y)
-        update(theta, lr, nabla_J)
+        theta = update(theta, lr, nabla_J)
+
+        if (i + 1) % (max_iter/20) == 0 and verbose:
+                print("Iterating: [%d%%]\r" %int((i+1)/max_iter * 100), end="")
+    if verbose:
+        print("")
 
     return theta, training_losses, test_losses
 
+
+def predict(theta, x):
+    temp = np.ones(x.shape[0]+1)
+    temp[1:] = x
+    return int(sigmoid(theta, temp) > 0.5)

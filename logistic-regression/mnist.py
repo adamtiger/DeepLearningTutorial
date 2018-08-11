@@ -76,7 +76,7 @@ def read_label(file_name):
 
             LABEL = read_uint8(lbs)
             labels.append(LABEL)
-            
+
             if (i + 1) % (num_of_imgs/20) == 0:
                 print("Reading labels: [%d%%]\r" %int((i+1)/num_of_imgs * 100), end="")
     print("")
