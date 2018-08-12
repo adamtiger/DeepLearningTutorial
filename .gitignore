@@ -2,8 +2,7 @@
 
 
 data/
-bias-variance/__pycache__/
-bias-variance/.ipynb_checkpoints/
-logistic-regression/__pycache__/
-logistic-regression/.ipynb_checkpoints/
+bias_variance/__pycache__/
+logistic_regression/__pycache__/
+pckutils/__pycache__/
 .ipynb_checkpoints/

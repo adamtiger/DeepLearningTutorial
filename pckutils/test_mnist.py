@@ -1,4 +1,4 @@
-import mnist
+from pckutils import mnist
 
 def test_mnist_read_imgs():
     

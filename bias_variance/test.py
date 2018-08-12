@@ -1,4 +1,4 @@
-import linearregr as L
+from bias_variance import linearregr as L
 import numpy as np
 from matplotlib import pyplot as plt
 

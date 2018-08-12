@@ -19,6 +19,17 @@ def loss(theta, xs, ys):
     return J
 
 
+def error_rate(theta, xs, ys):
+    '''
+    Error rate
+    '''
+    errors =0.0
+    for x, y in zip(xs, ys):
+        if int(sigmoid(theta, x) > 0.5) != y: # during training we do not need to put 1 for bias
+            errors += 1
+    return errors / len(xs)
+
+
 def grad(theta, xs, ys):
     '''
     xs - the input values in a list, each value is a numpy array
@@ -36,7 +47,7 @@ def update(theta, lr, gradient):
 
 
 def init(theta_size):
-    return np.random.uniform(theta_size)
+    return np.random.uniform(size=theta_size)
 
 
 def deduce_batch(xs, ys, size):
@@ -52,6 +63,19 @@ def deduce_batch(xs, ys, size):
     return batch_x, batch_y
 
 
+def copy(data):
+    '''
+    creates a copy of data in order to leave the original input untouched
+    data - a tuple of x, y
+    '''
+    xs_new, ys_new = [], []
+    xs_o, ys_o = data
+    for x, y in zip(xs_o, ys_o):
+        xs_new.append(np.copy(x))
+        ys_new.append(np.copy(y))
+    return xs_new, ys_new
+
+
 def logistic_regression(data, lr, max_iter, batch_size, epoch=5, split_ratio=0.8, verbose=False):
     '''
     data - a tuple containing two lists, first for the input and second for the labels,
@@ -63,7 +87,7 @@ def logistic_regression(data, lr, max_iter, batch_size, epoch=5, split_ratio=0.8
     split_ratio - the ratio of the training examples from data
     verbose - show progress during run
     '''
-    xs, ys = data
+    xs, ys = copy(data)
     theta_size = xs[0].shape[0] + 1 # +1 due to bias
     theta = init(theta_size)
 
@@ -91,20 +115,21 @@ def logistic_regression(data, lr, max_iter, batch_size, epoch=5, split_ratio=0.8
         ys_test.append(ys[indices[i]])
 
     # initializing list for losts
-    training_losses = []
-    test_losses = []
+    training_err_rate = []
+    test_err_rate = []
     
     batch_x, batch_y = deduce_batch(xs, ys, batch_size)
     for i in range(max_iter):
 
         if (i + 1) % (max_iter // 10) == 0:
-            test_loss = loss(theta, xs_test, ys_test) / (1 - split_ratio)
-            test_losses.append(test_loss)
+            test_errors = error_rate(theta, xs_test, ys_test)
+            test_err_rate.append(test_errors)
         
         if i % epoch == 0:
             batch_x, batch_y = deduce_batch(xs, ys, batch_size)
-        train_loss = loss(theta, batch_x, batch_y) / batch_size
-        training_losses.append(train_loss)
+
+        train_errors = error_rate(theta, batch_x, batch_y)
+        training_err_rate.append(train_errors)
 
         nabla_J = grad(theta, batch_x, batch_y)
         theta = update(theta, lr, nabla_J)
@@ -114,10 +139,13 @@ def logistic_regression(data, lr, max_iter, batch_size, epoch=5, split_ratio=0.8
     if verbose:
         print("")
 
-    return theta, training_losses, test_losses
+    return theta, training_err_rate, test_err_rate
 
 
 def predict(theta, x):
+    '''
+    x - the length is smaller with 1 compared to theta
+    '''
     temp = np.ones(x.shape[0]+1)
     temp[1:] = x
     return int(sigmoid(theta, temp) > 0.5)
