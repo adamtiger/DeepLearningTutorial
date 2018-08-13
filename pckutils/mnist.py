@@ -87,3 +87,18 @@ def read_label(file_name):
 def show_handwritten_digit(img_mtx, rows, cols):
     imshow(img_mtx.reshape((rows, cols)))
     show()
+
+
+def separate_labels(xs, ys, labels):
+    '''
+    Chooses the data samples with the given labels.
+    xs - list of images in a flat array
+    ys - list of corresponding labels
+    labels - the labels to gather, e.g. 1,2,3 will be kept but others will be throwen away
+    '''
+    xs_sep, ys_sep = [], []
+    for x, y in zip(xs, ys):
+        if y in labels:
+            xs_sep.append(x)
+            ys_sep.append(y)
+    return xs_sep, ys_sep
