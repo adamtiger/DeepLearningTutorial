@@ -1,54 +1,46 @@
 import numpy as np
 
-# This is an implementation of logistic regression.
+# This is an implementation of softmax regression.
+beta = 0.01
 
-def sigmoid(theta, x):
-    z = np.dot(theta, x)
-    return 1.0 / (1.0 + np.exp(-z))
-
-
-def loss(theta, xs, ys):
-    '''
-    xs - the input values in a list, each value is a numpy array
-    ys - the correct label for each input in a list
-    '''
-    J = 0.0
-    for x, y in zip(xs, ys):
-        h_theta = sigmoid(theta, x)
-        J += y * np.log(h_theta) + (1 - y) * np.log(1 - h_theta)
-    return J
+def softmax(theta, x):
+    z = beta * np.matmul(theta, x)
+    return np.exp(z)/np.sum(np.exp(z))
 
 
 def error_rate(theta, xs, ys):
     '''
     Error rate
     '''
-    errors =0.0
+    errors = 0
     for x, y in zip(xs, ys):
-        if int(sigmoid(theta, x) > 0.5) != y: # during training we do not need to put 1 for bias
+        if np.argmax(softmax(theta, x)) != np.argmax(y):
             errors += 1
     return errors / len(xs)
-
+    
 
 def grad(theta, xs, ys):
     '''
     xs - the input values in a list, each value is a numpy array
     ys - the correct label for each input in a list
+    beta is for avoiding overflow
     '''
-    g = np.zeros_like(xs[0])
+    grad = np.zeros_like(theta)
     for x, y in zip(xs, ys):
-        h_theta = sigmoid(theta, x)
-        g += (y - h_theta) * x
-    return g/np.linalg.norm(g)
+        grad += beta * np.outer((y - softmax(theta, x)), x)
+    return grad/np.linalg.norm(grad)
 
 
 def update(theta, lr, gradient):
-    theta_ = theta + lr * gradient
-    return theta_/np.linalg.norm(theta_) # normalizing theta to avoid overflow
+    return theta + lr * gradient
 
 
-def init(theta_size):
-    return np.random.uniform(size=theta_size)
+def init(theta_size, k):
+    '''
+    theta - weight matrix
+    k - number of classes
+    '''
+    return np.random.uniform(size=(k, theta_size))
 
 
 def deduce_batch(xs, ys, size):
@@ -64,11 +56,11 @@ def deduce_batch(xs, ys, size):
     return batch_x, batch_y
 
 
-def copy(data, fn):
+def copy(data, fn=lambda x: x):
     '''
     creates a copy of data in order to leave the original input untouched
+    and 
     data - a tuple of x, y
-    fn - function for transforming the input data (e.g. normalizing)
     '''
     xs_new, ys_new = [], []
     xs_o, ys_o = data
@@ -78,7 +70,7 @@ def copy(data, fn):
     return xs_new, ys_new
 
 
-def logistic_regression(data, lr, max_iter, batch_size, epoch=5, split_ratio=0.8, verbose=False):
+def softmax_regression(data, k, lr, max_iter, batch_size, epoch=5, verbose=False):
     '''
     data - a tuple containing two lists, first for the input and second for the labels,
            each element of the input list is a 1-D numpy array
@@ -86,12 +78,11 @@ def logistic_regression(data, lr, max_iter, batch_size, epoch=5, split_ratio=0.8
     max_iter - number of iterations during optimization
     batch_size - size of a batch
     epoch - number of repetition for a batch
-    split_ratio - the ratio of the training examples from data
     verbose - show progress during run
     '''
     xs, ys = copy(data, lambda t: t.astype(np.float32)/255.0)
     theta_size = xs[0].shape[0] + 1 # +1 due to bias
-    theta = init(theta_size)
+    theta = init(theta_size, k)
 
     # extend xs wih 1s
     for i, x in enumerate(xs):
@@ -99,33 +90,17 @@ def logistic_regression(data, lr, max_iter, batch_size, epoch=5, split_ratio=0.8
         temp[1:] = x
         xs[i] = temp
     
-    # split the data
-    indices = np.array([i for i in range(len(xs))])
-    np.random.shuffle(indices)
-    break_point = int(len(xs) * split_ratio)
+    # one-hot-encode y
+    for i, y in enumerate(ys):
+        temp = np.zeros(k)
+        temp[y] = 1
+        ys[i] = temp
 
-    xs_train = []
-    ys_train = []
-    for i in range(break_point):
-        xs_train.append(xs[indices[i]])
-        ys_train.append(ys[indices[i]])
-
-    xs_test = []
-    ys_test = []
-    for i in range(break_point, len(xs)):
-        xs_test.append(xs[indices[i]])
-        ys_test.append(ys[indices[i]])
-
-    # initializing list for losts
+    # initializing list for error rates
     training_err_rate = []
-    test_err_rate = []
     
     batch_x, batch_y = deduce_batch(xs, ys, batch_size)
     for i in range(max_iter):
-
-        if (i + 1) % (max_iter // 10) == 0:
-            test_errors = error_rate(theta, xs_test, ys_test)
-            test_err_rate.append(test_errors)
         
         if i % epoch == 0:
             batch_x, batch_y = deduce_batch(xs, ys, batch_size)
@@ -141,13 +116,13 @@ def logistic_regression(data, lr, max_iter, batch_size, epoch=5, split_ratio=0.8
     if verbose:
         print("")
 
-    return theta, training_err_rate, test_err_rate
+    return theta, training_err_rate
 
 
 def predict(theta, x):
     '''
     x - the length is smaller with 1 compared to theta
     '''
-    temp = np.ones(x.shape[0]+1)
+    temp = np.zeros(theta.shape[1])
     temp[1:] = x
-    return int(sigmoid(theta, temp) > 0.5)
+    return softmax(theta, temp)
