@@ -20,7 +20,7 @@ class MeanSquaredError(Loss):
     def delta_last(self, y_predicted, y):
         delta = np.zeros_like(y)
         delta += y_predicted - y
-        return 1.0 * delta
+        return delta
 
 
 class CrossEntropy(Loss):
@@ -28,13 +28,14 @@ class CrossEntropy(Loss):
     def loss(self, ys_predicted, ys):
         L = 0
         for y_p, y in zip(ys_predicted, ys):
-            L += np.dot(y_p, np.log(y))
+            idx = np.argmax(y)
+            L += np.log(y_p[idx])
         return -1.0 / len(ys) * L
 
     def delta_last(self, y_predicted, y):
         delta = np.zeros_like(y)
         delta += y / y_predicted
-        return -1.0 * delta
+        return -delta
 
 
 class Huber(Loss):
