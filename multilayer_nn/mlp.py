@@ -56,7 +56,7 @@ class Mlp:
             wx = w_times_xs[l]
             h = hs[l]
             df = self.activations[l].d_activate
-            df_wx = np.matmul(df(wx), delta)
+            df_wx = np.matmul(delta, df(wx))
             self.gradients[l] += np.outer(df_wx, h) # calculate gradient for delta
             delta = np.matmul(df_wx, self.theta[l]) # calculate new delta
 
