@@ -49,12 +49,10 @@ class Relu(Activation):
 class Tanh(Activation):
 
     def activate(self, x):
-        counter = np.exp(x) - np.exp(-x)
-        denom = np.exp(x) + np.exp(-x)
-        return counter / denom
+        return np.tanh(x)
     
     def d_activate(self, x):
-        chx = (np.exp(x) + np.exp(-x))/2.0
+        chx = np.cosh(x)
         return np.diag(1.0 / np.square(chx))
 
 
