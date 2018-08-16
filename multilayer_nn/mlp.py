@@ -24,7 +24,7 @@ class Mlp:
             else:
                 assert False, "Missing input_length at first layer!"
 
-        w = self.initializer.create((input_length, nodes))
+        w = self.initializer.create((nodes, input_length))
         self.theta.append(w)
         self.activations.append(activation)
         self.layers += 1
@@ -37,20 +37,20 @@ class Mlp:
         hs = []
         x_current = x
         for w, a in zip(self.theta, self.activations):
+            hs.append(x_current)
             w_times_x = np.matmul(w, x_current)
             h = a.activate(w_times_x)
             w_times_xs.append(w_times_x)
-            hs.append(h)
             x_current = h
         return x_current, w_times_xs, hs
 
-    def __backward(self, w_times_xs, hs, y_real):
+    def __backward(self, yp, w_times_xs, hs, y_real):
         '''
         w_times_xs - w product x for all hidden layers (list)
         hs - outputs of each layer (list)
         y_real - a real output from the training set (one sample)
         '''
-        y_predicted = hs[-1]
+        y_predicted = yp
         delta = self.loss.delta_last(y_predicted, y_real) + self.regularizer.delta_last(y_predicted, y_real)
         for l in range(self.layers-1, -1, -1): # walking the list backward direction
             wx = w_times_xs[l]
@@ -75,7 +75,7 @@ class Mlp:
 
         indices = np.array([t for t in range(len(xs))])
         
-        for ep in episode:
+        for ep in range(episode):
             if verbose:
                 print('Episode: ' + str(ep))
 
@@ -96,7 +96,7 @@ class Mlp:
                 for bx, by in zip(batch_x, batch_y):
 
                     yp, w_times_xs, hs = self.__forward(bx)
-                    self.__backward(w_times_xs, hs, by)
+                    self.__backward(yp, w_times_xs, hs, by)
                     batch_y_p.append(yp)
                 
                 self.__multiply_gradient_list(1.0 / len(batch_x))
@@ -115,7 +115,7 @@ class Mlp:
              index > gives the index of the maximum element in y (in case of classification)
              raw > gives y as it comes out from the network, no further transformation is applied
         '''
-        y = self.__forward(x)
+        y, _, _ = self.__forward(x)
         if mode == 'raw':
             return y
         elif mode == 'index':
