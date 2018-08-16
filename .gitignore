@@ -1,5 +1,6 @@
 .vscode/
 
+deeptutorial.egg-info/
 data/
 bias_variance/__pycache__/
 logistic_regression/__pycache__/

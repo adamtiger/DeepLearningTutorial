@@ -1,6 +1,6 @@
 import numpy as np
 import math as m
-import activations
+from multilayer_nn import activations
 
 
 def check(name, y_exp, y_calc, dy_exp, dy_calc):

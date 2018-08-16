@@ -1,5 +1,5 @@
 import numpy as np
-import losses
+from multilayer_nn import losses
 
 
 def test_MSE():
