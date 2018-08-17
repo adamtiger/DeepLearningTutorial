@@ -1,7 +1,7 @@
 import numpy as np
 
 # This is an implementation of softmax regression.
-beta = 0.01
+beta = 1.0
 
 def softmax(theta, x):
     z = beta * np.matmul(theta, x)
@@ -40,7 +40,7 @@ def init(theta_size, k):
     theta - weight matrix
     k - number of classes
     '''
-    return np.random.uniform(size=(k, theta_size))
+    return np.random.uniform(low=-1, high=1, size=(k, theta_size))
 
 
 def deduce_batch(xs, ys, size):
@@ -49,7 +49,8 @@ def deduce_batch(xs, ys, size):
 
     indices = np.array([t for t in range(len(xs))])
     np.random.shuffle(indices)
-    for idx in indices.tolist():
+    for i in range(size):
+        idx = indices[i]
         batch_x.append(xs[idx])
         batch_y.append(ys[idx])
 
@@ -74,13 +75,14 @@ def softmax_regression(data, k, lr, max_iter, batch_size, epoch=5, verbose=False
     '''
     data - a tuple containing two lists, first for the input and second for the labels,
            each element of the input list is a 1-D numpy array
+    k - number of classes
     lr - learning rate
     max_iter - number of iterations during optimization
     batch_size - size of a batch
     epoch - number of repetition for a batch
     verbose - show progress during run
     '''
-    xs, ys = copy(data, lambda t: t.astype(np.float32)/255.0)
+    xs, ys = copy(data, lambda t: t/255.0)
     theta_size = xs[0].shape[0] + 1 # +1 due to bias
     theta = init(theta_size, k)
 

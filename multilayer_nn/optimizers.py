@@ -17,4 +17,4 @@ class SGD(Optimizer):
     def optimizer_step(self, theta, gradients):
 
         for idx, (w, grad) in enumerate(zip(theta, gradients)):
-            theta[idx] = w + self.lr * grad
+            theta[idx] = w - self.lr * grad

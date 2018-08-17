@@ -68,20 +68,19 @@ class Mlp:
             for idx in range(self.layers):
                 self.gradients[idx] *= 0.0
     
-    def __multiply_gradient_list(self, factor):
-        self.gradients = list(map(lambda x: factor * x, self.gradients))
+    def __normalize_gradient_list(self):
+        self.gradients = list(map(lambda x: x / np.linalg.norm(x), self.gradients))
 
     def fit(self, xs, ys, episode, batch_size, verbose=False, callback=None):
 
         indices = np.array([t for t in range(len(xs))])
         
         for ep in range(episode):
-            if verbose:
-                print('Episode: ' + str(ep))
 
             np.random.shuffle(indices)
             
-            for itr in range(int(len(xs)/batch_size)):
+            ep_length = int(len(xs)/batch_size)
+            for itr in range(ep_length):
 
                 # creating a new batch
                 batch_x, batch_y = [], []
@@ -99,13 +98,14 @@ class Mlp:
                     self.__backward(yp, w_times_xs, hs, by)
                     batch_y_p.append(yp)
                 
-                self.__multiply_gradient_list(1.0 / len(batch_x))
+                self.__normalize_gradient_list()
+                self.optimizer.optimizer_step(self.theta, self.gradients)
                 loss = self.loss.loss(batch_y_p, batch_y) + self.regularizer.reg_term(batch_y_p, batch_y)
                 
                 if callback is not None:
                     callback(batch_y_p, batch_y, loss, ep, itr)
 
-                print_progress(itr, int(len(xs)/batch_size), verbose)
+                print_progress(ep * ep_length + itr, ep_length * episode, verbose)
     
     def predict(self, x, mode):
         '''

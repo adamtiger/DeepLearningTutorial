@@ -1,8 +1,53 @@
+import numpy as np
 
 
 def print_progress(status, max_iter, verbose):
-    if (status + 1) % int(max_iter/20) == 0 and verbose:
-        print("Iterating: [%d%%]\r" %int((status+1)/max_iter * 100), end="")
+    '''
+    Prints the current progress as a precentage.
+    '''
+    if verbose:
+        print("Iterating: [%d%%]\r" %int(status/max_iter * 100), end="")
         if int((status + 1)/max_iter) == 1:
             print("")
 
+def scale(xs, factor):
+    xs_scaled = []
+    for x in xs:
+        xs_scaled.append(x * factor)
+    return xs_scaled
+
+def add_bias_to_vectors(xs):
+    '''
+    The bias is taken into account by adding a 1 to the beginning of the vectors.
+    '''
+    xs_bias = []
+    for x in xs:
+        temp = np.ones(x.shape[0] + 1)
+        temp[1:] = x
+        xs_bias.append(temp)
+    return xs_bias
+
+def one_hot_encode(ys, k):
+    '''
+    Create the one-hot-encoded representation of a label.
+    E.g.: k= 3, y = 2 => y_encoded = [0, 0, 1]
+    ys - list of lables
+    k - number of values
+    '''
+    ys_encoded = []
+    for y in ys:
+        temp = np.zeros(k)
+        temp[y] = 1
+        ys_encoded.append(temp)
+    return ys_encoded
+
+def error_rate(ys_pred, ys):
+    '''
+    ys_pred - list of numpy arrays with probabilities of falling into a class
+    ys - list of one-hot-encoded lables
+    '''
+    errors = 0.0
+    for y_pred, y in zip(ys_pred, ys):
+        if np.argmax(y_pred) != np.argmax(y):
+            errors += 1.0
+    return errors / len(ys)

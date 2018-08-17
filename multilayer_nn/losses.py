@@ -34,7 +34,7 @@ class CrossEntropy(Loss):
 
     def delta_last(self, y_predicted, y):
         delta = np.zeros_like(y)
-        delta += y / y_predicted
+        delta += y / (y_predicted + 1e-6)
         return -delta
 
 
