@@ -1,4 +1,5 @@
 import numpy as np
+import json
 
 
 def print_progress(status, max_iter, verbose):
@@ -51,3 +52,24 @@ def error_rate(ys_pred, ys):
         if np.argmax(y_pred) != np.argmax(y):
             errors += 1.0
     return errors / len(ys)
+
+def save_parameters(thetas, path):
+    '''
+    Saves the parameters of a model.
+    thetas - list of parameters to be saved, the parameters are numpy matrices
+    path - the path to the weight file
+    '''
+    thetas_as_list = []
+    for theta in thetas:
+        thetas_as_list.append(theta.tolist())
+    with open(path, 'w') as file:
+        json.dump(thetas_as_list, file)
+
+def load_parameters(path):
+    '''
+    Loads the parameters for a model.
+    path - the path to the saved weights
+    '''
+    with open(path, 'r') as file:
+        thetas = json.load(file)
+    return list(map(np.array, thetas))
