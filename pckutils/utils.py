@@ -42,6 +42,17 @@ def one_hot_encode(ys, k):
         ys_encoded.append(temp)
     return ys_encoded
 
+def create_binary_image(xs):
+    '''
+    Changes the values between 0 and 255 to 0 and 1.
+    xs - list of input images (28x28 numpy arrays)
+    '''
+    xs_bin = []
+    for x in xs:
+        x_bin = (x > 20).astype(np.float32)
+        xs_bin.append(x_bin)
+    return xs_bin
+
 def error_rate(ys_pred, ys):
     '''
     ys_pred - list of numpy arrays with probabilities of falling into a class
