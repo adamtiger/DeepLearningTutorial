@@ -2,6 +2,7 @@
 
 deeptutorial.egg-info/
 images/
+weights/
 bias_variance/__pycache__/
 logistic_regression/__pycache__/
 softmax_regression/__pycache__/
@@ -10,3 +11,4 @@ pckutils/__pycache__/
 .ipynb_checkpoints/
 *.gz
 *.mnist
+*.json
