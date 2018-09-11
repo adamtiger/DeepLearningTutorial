@@ -73,3 +73,25 @@ class Softmax(Activation):
     def d_activate(self, x):
         s = self.activate(x)
         return np.diag(s) - np.outer(s, s)
+
+
+class Elu(Activation):
+
+    def activate(self, x):
+        mask = np.greater_equal(0, x)
+        return (np.exp(x) - 1) * mask + x * (1 - mask)
+    
+    def d_activate(self, x):
+        mask = np.greater_equal(0, x)
+        dv = (np.exp(x)) * mask + 1 * (1 - mask)
+        return np.diag(dv)
+
+
+class SoftPlus(Activation):
+
+    def activate(self, x):
+        return np.log(np.exp(x) + 1)
+    
+    def d_activate(self, x):
+        dv = np.exp(x) / (1 + np.exp(x))
+        return np.diag(dv)
