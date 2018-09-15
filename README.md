@@ -1,7 +1,7 @@
 # DeepLearningTutorial
 
-The main goal is to address both the basics and the advanced parts of deep learning. 
-This repository is a set of tutorials in three main topics:
+The main goal here is to address both the basics and the advanced parts of deep learning. 
+This repository contains a set of tutorials in three main topics:
 
 * deep learning basics (the name of the files starts with DL)
 * tutorials on more advanced topics with Pytorch or Scikit-learn (starts with PT)
