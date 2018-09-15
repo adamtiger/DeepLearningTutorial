@@ -28,4 +28,4 @@ If you decide to try out things you should follow the steps below:
 
 ### Contact
 
-If you have some trouble, feel free to submmit an issue with a detailed description of the problem you faced with.
+If you have some trouble, feel free to submit an issue with a detailed description of the problem you faced with.
