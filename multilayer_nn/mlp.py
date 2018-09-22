@@ -51,13 +51,13 @@ class Mlp:
         y_real - a real output from the training set (one sample)
         '''
         y_predicted = yp
-        delta = self.loss.delta_last(y_predicted, y_real) + self.regularizer.delta_last(y_predicted, y_real)
+        delta = self.loss.delta_last(y_predicted, y_real) #+ self.regularizer.delta_last(y_predicted, y_real)
         for l in range(self.layers-1, -1, -1): # walking the list backward direction
             wx = w_times_xs[l]
             h = hs[l]
             df = self.activations[l].d_activate
             df_wx = np.matmul(delta, df(wx))
-            self.gradients[l] += np.outer(df_wx, h) # calculate gradient for delta
+            self.gradients[l] += np.outer(df_wx, h) + self.regularizer.delta_last(self.theta)[l] # calculate gradient for delta
             delta = np.matmul(df_wx, self.theta[l]) # calculate new delta
 
     def __init_gradients(self):
@@ -100,7 +100,7 @@ class Mlp:
                 
                 self.__normalize_gradient_list()
                 self.optimizer.optimizer_step(self.theta, self.gradients)
-                loss = self.loss.loss(batch_y_p, batch_y) + self.regularizer.reg_term(batch_y_p, batch_y)
+                loss = self.loss.loss(batch_y_p, batch_y) + self.regularizer.reg_term(self.theta)
                 
                 if callback is not None:
                     callback(batch_y_p, batch_y, loss, ep, itr)
