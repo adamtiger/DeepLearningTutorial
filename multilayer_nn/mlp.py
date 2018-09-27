@@ -14,6 +14,7 @@ class Mlp:
         self.theta = []
         self.activations = []
         self.gradients = []
+        self.sniffer = lambda x: x  # this can be a function for gathering the hidden layers activations
 
         self.layers = 0 # number of layers
     
@@ -42,7 +43,7 @@ class Mlp:
             h = a.activate(w_times_x)
             w_times_xs.append(w_times_x)
             x_current = h
-        return x_current, w_times_xs, hs
+        return x_current, w_times_xs, self.sniffer(hs)
 
     def __backward(self, yp, w_times_xs, hs, y_real):
         '''
@@ -51,13 +52,14 @@ class Mlp:
         y_real - a real output from the training set (one sample)
         '''
         y_predicted = yp
-        delta = self.loss.delta_last(y_predicted, y_real) #+ self.regularizer.delta_last(y_predicted, y_real)
+        delta = self.loss.delta_last(y_predicted, y_real) 
+        regression_term = self.regularizer.delta_last(self.theta)
         for l in range(self.layers-1, -1, -1): # walking the list backward direction
             wx = w_times_xs[l]
             h = hs[l]
             df = self.activations[l].d_activate
             df_wx = np.matmul(delta, df(wx))
-            self.gradients[l] += np.outer(df_wx, h) + self.regularizer.delta_last(self.theta)[l] # calculate gradient for delta
+            self.gradients[l] += np.outer(df_wx, h) + regression_term[l]  # calculate gradient for delta
             delta = np.matmul(df_wx, self.theta[l]) # calculate new delta
 
     def __init_gradients(self):

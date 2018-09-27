@@ -25,7 +25,7 @@ class ZeroRegularizer(Regularizer):
         return 0
 
     def delta_last(self, ws):
-        return 0
+        return [0] * len(ws)
 
 
 class L1(Regularizer):
