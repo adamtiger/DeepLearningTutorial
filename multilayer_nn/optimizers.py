@@ -45,7 +45,9 @@ class Momentum(Optimizer):
 
 
 class Adam(Optimizer):
-    
+    '''
+    Article: https://arxiv.org/pdf/1412.6980.pdf
+    '''
     def __init__(self, beta1, beta2, lr):
         super().__init__(lr)
         self.beta1 = beta1
@@ -70,7 +72,9 @@ class Adam(Optimizer):
 
 
 class Adadelta(Optimizer):
-    
+    '''
+    Article: https://arxiv.org/pdf/1212.5701.pdf
+    '''
     def __init__(self, gamma):
         '''
         Here the lr is not used.
@@ -96,7 +100,9 @@ class Adadelta(Optimizer):
         
 
 class RMSProp(Optimizer):
-    
+    '''
+    Reference: http://www.cs.toronto.edu/~tijmen/csc321/slides/lecture_slides_lec6.pdf
+    '''
     def __init__(self, gamma, lr):
         super().__init__(lr)
         self.gamma = gamma
