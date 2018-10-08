@@ -87,7 +87,7 @@ class Adadelta(Optimizer):
     def optimizer_step(self, theta, gradients):
 
         def rms(x):
-            return np.sqrt(x * x + 1e-8)
+            return np.sqrt(x * x) + 1e-10
 
         if self.G is None and self.delta_Th is None:
             self.G = [np.zeros(gradients[0].shape)] * len(theta)
@@ -112,8 +112,9 @@ class RMSProp(Optimizer):
         if self.G is None:
            self.G = [np.zeros(gradients[0].shape)] * len(theta)
         for idx, g in enumerate(gradients):
+            g = g / np.linalg.norm(g)
             self.G[idx] += self.gamma * self.G[idx] + (1 - self.gamma) * g * g
-            theta[idx] = theta[idx] - self.lr / np.sqrt(self.G + 1e-8) * g 
+            theta[idx] = theta[idx] - self.lr / np.sqrt(self.G[idx]) * g 
 
 
 class Adagrad(Optimizer):
@@ -127,4 +128,4 @@ class Adagrad(Optimizer):
             self.G = [np.zeros(gradients[0].shape)] * len(theta)
         for idx, g in enumerate(gradients):
             self.G[idx] += g * g
-            theta[idx] = theta[idx] - self.lr * 1.0 / np.sqrt(self.G[idx] + 1e-8)
+            theta[idx] = theta[idx] - self.lr * 1.0 / np.sqrt(self.G[idx])
