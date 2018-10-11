@@ -1,6 +1,7 @@
 .vscode/
 
 deeptutorial.egg-info/
+papers/
 images/
 weights/
 bias_variance/__pycache__/
