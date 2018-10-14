@@ -3,7 +3,7 @@ import numpy as np
 
 class Convolution:
 
-    def __init__(self, input_shape, filters, kernel_size, strides, dilations, padding, activation):
+    def __init__(self, input_shape, filters, kernel_size, strides, dilations, padding):
         '''
         Reference implementation of a 2-dimensional Convolution operation. 
         Performance has not priority here.
@@ -13,7 +13,6 @@ class Convolution:
         strides - the stride (the window slides to a next position) for the kernels, tuple or list with two elements
         dilations - tuple or list
         padding - string, can be VALID or SAME
-        activation - applied after the convolution is done
         '''
         self.batch, self.height, self.width, self.channel = input_shape
         self.filters = filters
@@ -21,7 +20,6 @@ class Convolution:
         self.strides = strides
         self.dilations = dilations
         self.padding = padding
-        self.activation = activation
         
         # initialize the kernel with random numbers to break the symmetry
         self.kernel = np.random.rand(filters, kernel_size[0], kernel_size[1], self.channel)
@@ -63,7 +61,7 @@ class Convolution:
                                 i_w = k_w + w * self.strides[1]
                                 for k_c in range(self.kernel.shape[3]):
                                     y[b, h, w, c] += self.kernel[c, k_h, k_w, k_c] * x[b, i_h, i_w, k_c]
-        return y
+        return y, x
 
     def __call__(self, x):
-        self.execute(x)
+        return self.execute(x)
