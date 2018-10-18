@@ -32,7 +32,7 @@ class Convolution:
             window_size = [(self.kernel_size[0] - 1) * (self.dilations[0] + 1) + 1, (self.kernel_size[1] - 1) * (self.dilations[1] + 1) + 1]
             output_height = (self.height - window_size[0]) // self.strides[0] + 1
             output_width = (self.width - window_size[1]) // self.strides[1] + 1
-            self.output_size = (self.batch, output_height, output_width, self.channel)
+            self.output_size = (self.batch, output_height, output_width, self.filters)
         else:
             raise AttributeError('Unknown type of padding!')
 
@@ -40,28 +40,30 @@ class Convolution:
         return self.output_size
 
     def execute(self, x):
+        x_ = np.copy(x)
         if self.padding == 'SAME':
             window_size = [(self.kernel_size[0] - 1) * (self.dilations[0] + 1) + 1, (self.kernel_size[1] - 1) * (self.dilations[1] + 1) + 1]
-            pad_x = ((self.output_size[0] - 1) * self.strides[0] - (self.height - window_size[0])) // 2
-            pad_y = ((self.output_size[1] - 1) * self.strides[1] - (self.height - window_size[1])) // 2
+            pad_x = window_size[0] - (self.height - window_size[0]) % self.strides[0]
+            pad_y = window_size[1] - (self.width - window_size[1]) % self.strides[1]
 
-            temp = np.zeros((x.shape[0], x.shape[1] + 2 * pad_x, x.shape[2] + 2 * pad_y, x.shape[3]))
-            temp[:, pad_x:(x.shape[1] + pad_x), pad_y:(x.shape[2] + pad_y), :] = x[:, :, :, :]
+            temp = np.zeros((x.shape[0], x.shape[1] + pad_x, x.shape[2] + pad_y, x.shape[3]))
+            temp[:, 0:x.shape[1], 0:x.shape[2], :] = x[:, :, :, :]
             x = temp
 
         y = np.zeros(shape=self.output_size)
         for b in range(y.shape[0]):
             for h in range(y.shape[1]):
                 for w in range(y.shape[2]):
-                    for c in range(y.shape[3]):
-
+                    
+                    for f in range(self.kernel.shape[0]):
                         for k_h in range(self.kernel.shape[1]):
                             for k_w in range(self.kernel.shape[2]):
                                 i_h = k_h + h * self.strides[0]
                                 i_w = k_w + w * self.strides[1]
                                 for k_c in range(self.kernel.shape[3]):
-                                    y[b, h, w, c] += self.kernel[c, k_h, k_w, k_c] * x[b, i_h, i_w, k_c]
-        return y, x
+                                    y[b, h, w, f] += self.kernel[f, k_h, k_w, k_c] * x[b, i_h, i_w, k_c]
+        x = x_
+        return y
 
     def __call__(self, x):
         return self.execute(x)
